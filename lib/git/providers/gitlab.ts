@@ -37,11 +37,38 @@ export class GitLabProvider implements GitProvider {
     return h;
   }
 
+  private branchCache: Record<string, string> = {};
+
+  private async getBranch(config: SourceConfig, baseUrl: string, projectPath: string): Promise<string> {
+    if (config.branch) return config.branch;
+    
+    const cacheKey = `${baseUrl}/${projectPath}`;
+    if (this.branchCache[cacheKey]) return this.branchCache[cacheKey];
+
+    try {
+      const projectUrl = `${baseUrl}/api/v4/projects/${projectPath}`;
+      const projectRes = await fetch(projectUrl, { headers: this.headers(config.token) });
+      if (projectRes.ok) {
+        const project = await projectRes.json();
+        const detected = project.default_branch || 'main';
+        this.branchCache[cacheKey] = detected;
+        return detected;
+      } else {
+        const errBody = await projectRes.text();
+        console.warn(`[GitLab] Failed to detect default branch (${projectRes.status}): ${errBody}. Falling back to 'main'.`);
+      }
+    } catch (e) {
+      console.warn(`[GitLab] Error detecting default branch: ${e}. Falling back to 'main'.`);
+    }
+
+    return 'main';
+  }
+
   async fetchTree(config: SourceConfig): Promise<FileTreeEntry[]> {
     if (!config.url) throw new Error('source.url is required for GitLab provider');
 
     const { baseUrl, projectPath } = parseGitLabUrl(config.url);
-    const branch = config.branch ?? 'main';
+    const branch = await this.getBranch(config, baseUrl, projectPath);
     const docsPath = config.docsPath ?? 'docs';
 
     // GitLab pageinates – collect all pages
@@ -95,7 +122,7 @@ export class GitLabProvider implements GitProvider {
     if (!config.url) throw new Error('source.url is required for GitLab provider');
 
     const { baseUrl, projectPath } = parseGitLabUrl(config.url);
-    const branch = config.branch ?? 'main';
+    const branch = await this.getBranch(config, baseUrl, projectPath);
     const docsPath = config.docsPath ?? 'docs';
 
     const fullPath = `${docsPath}/${filePath}`;
