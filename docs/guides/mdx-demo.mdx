@@ -1,0 +1,77 @@
+---
+title: MDX Demo
+description: Showcasing interactive components in documentation
+order: 10
+---
+
+# MDX Components
+
+Welcome to the MDX demo! You can use React components directly in your markdown.
+
+## Callouts
+
+Use the `<Callout>` component to highlight important information.
+
+<Callout type="note">
+  This is a standard note. It uses the `Callout` component.
+</Callout>
+
+<Callout type="warning">
+  Be careful! This is a warning callout.
+</Callout>
+
+<Callout type="tip">
+  **Pro Tip**: You can use markdown inside callouts too!
+</Callout>
+
+## Cards and Grids
+
+You can use the `<Grid>` and `<Card>` components to create feature sections.
+
+<Grid cols={2}>
+  <Card 
+    title="Installation" 
+    description="Learn how to install and set up the project." 
+    href="/docs/getting-started/installation"
+    icon="🚀"
+  />
+  <Card 
+    title="Configuration" 
+    description="Customize the look and feel of your docs." 
+    href="/docs/guides/configuration"
+    icon="⚙️"
+  />
+  <Card 
+    title="API Reference" 
+    description="Detailed documentation for the Content API." 
+    href="/docs/api/content-api"
+    icon="📚"
+  />
+  <Card 
+    title="Deployment" 
+    description="Ship your documentation to any static host." 
+    href="/docs/guides/deployment"
+    icon="☁️"
+  />
+</Grid>
+
+## Regular Markdown
+
+Regular GFM features still work perfectly:
+
+- **Bold** and *Italic*
+- [Links](/docs)
+- `Inline code`
+- Blocks of code:
+
+```typescript
+function hello() {
+  console.log("Hello from MDX!");
+}
+```
+
+| Feature | Support |
+| ------- | ------- |
+| MDX     | Yes     |
+| GFM     | Yes     |
+| Shiki   | Yes     |
